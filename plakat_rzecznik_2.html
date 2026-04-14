@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tomek Morek & Ksenia Kasparek · Rzecznicy Praw Ucznia</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #07070f;
+    --surface: #10101e;
+    --border:  #1e1e38;
+    --purple:  #7c3aed;
+    --violet:  #a855f7;
+    --cyan:    #22d3ee;
+    --pink:    #ec4899;
+    --white:   #f1f5f9;
+    --muted:   #64748b;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html {
+    background: #07070f;
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+
+  body {
+    background: #07070f;
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ===== TOPBAR ===== */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 100;
+    background: rgba(7,7,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hamburger {
+    width: 40px; height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .hamburger:hover { background: var(--border); }
+  .hamburger span {
+    display: block;
+    height: 2px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s, width 0.3s;
+    transform-origin: left center;
+  }
+  .hamburger span:nth-child(2) { width: 65%; }
+  .hamburger span:nth-child(3) { width: 80%; }
+
+  body.menu-open .hamburger span:nth-child(1) { transform: rotate(45deg) translate(1px,-1px); }
+  body.menu-open .hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  body.menu-open .hamburger span:nth-child(3) { transform: rotate(-45deg) translate(1px,1px); width: 100%; }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .logo span { color: var(--cyan); }
+
+  .btn-home {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-home:hover { border-color: var(--purple); background: rgba(124,58,237,0.1); }
+  .btn-home svg { width:14px; height:14px; }
+
+  /* ===== SIDE MENU ===== */
+  .side-menu {
+    position: fixed;
+    top: 60px; left: 0; bottom: 0;
+    width: 300px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    z-index: 90;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    overflow-y: auto;
+  }
+
+  body.menu-open .side-menu { transform: translateX(0); }
+
+  .menu-header {
+    padding: 0 28px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .menu-header p {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 28px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .menu-item:hover { background: rgba(124,58,237,0.08); }
+  .menu-item.active {
+    background: rgba(124,58,237,0.12);
+    border-left-color: var(--purple);
+  }
+
+  .menu-item-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--purple);
+    width: 20px;
+    flex-shrink: 0;
+  }
+  .menu-item-text { display: flex; flex-direction: column; gap: 2px; }
+  .menu-item-label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+  .menu-item-title { font-size: 14px; font-weight: 500; color: var(--white); }
+
+  .menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+  }
+  body.menu-open .menu-overlay { display: block; }
+
+  /* ===== PAGES ===== */
+  .page {
+    position: fixed;
+    inset: 0;
+    padding-top: 60px;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateY(16px);
+  }
+
+  .page.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  /* ===== HOME PAGE ===== */
+  #home {
+    background: var(--bg);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .home-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+  }
+  .orb-1 {
+    width: 500px; height: 500px;
+    background: var(--purple);
+    top: -150px; right: -100px;
+  }
+  .orb-2 {
+    width: 400px; height: 400px;
+    background: var(--cyan);
+    bottom: -150px; left: -100px;
+  }
+  .orb-3 {
+    width: 300px; height: 300px;
+    background: var(--pink);
+    top: 40%; left: 50%;
+    transform: translate(-50%,-50%);
+    opacity: 0.12;
+  }
+
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .home-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .home-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.4);
+    color: var(--violet);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 32px;
+    animation: fadeIn 0.5s ease both 0.1s;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--violet);
+    animation: blink 2s ease infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .home-names {
+    animation: fadeIn 0.5s ease both 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .home-name {
+    font-size: clamp(44px, 8vw, 90px);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -3px;
+  }
+  .home-name .first { color: var(--white); }
+  .home-name .last {
+    display: inline;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .home-name-2 .last {
+    background: linear-gradient(135deg, var(--pink), var(--violet));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .name-and {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(14px, 2vw, 20px);
+    color: var(--muted);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    animation: fadeIn 0.5s ease both 0.25s;
+  }
+
+  .home-meta {
+    margin-top: 24px;
+    display: flex;
+    gap: 0;
+    animation: fadeIn 0.5s ease both 0.3s;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .home-meta-item {
+    padding: 12px 24px;
+    font-size: 13px;
+    color: var(--muted);
+    border-right: 1px solid var(--border);
+  }
+  .home-meta-item:last-child { border-right: none; }
+  .home-meta-item strong { color: var(--white); font-weight: 500; }
+
+  /* ===== HOME CARDS ===== */
+  .home-cards {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    max-width: 960px;
+    width: 90vw;
+    animation: fadeIn 0.5s ease both 0.4s;
+  }
+
+  .home-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px 48px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.25s, transform 0.25s, background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .home-card:hover {
+    border-color: rgba(124,58,237,0.5);
+    transform: translateY(-4px);
+    background: rgba(124,58,237,0.05);
+  }
+  .home-card:hover::before { opacity: 1; }
+
+  .card-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    margin-bottom: 14px;
+  }
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .card-arrow {
+    position: absolute;
+    bottom: 16px; right: 18px;
+    color: var(--border);
+    font-size: 18px;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .home-card:hover .card-arrow { color: var(--purple); transform: translate(2px,-2px); }
+
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ===== INNER PAGES ===== */
+  .inner-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding: 48px 24px 100px;
+    overflow-y: auto;
+  }
+
+  .page-wrap {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .eyebrow-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.3);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .eyebrow-label {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .page-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    margin-bottom: 28px;
+    color: var(--white);
+  }
+  .page-title .accent {
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Divider line */
+  .line-accent {
+    width: 48px; height: 3px;
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+    border-radius: 3px;
+    margin-bottom: 28px;
+  }
+
+  /* ===== DUO COLUMNS ===== */
+  .duo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .duo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .duo-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .duo-card.tomek::before {
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+  }
+  .duo-card.ksenia::before {
+    background: linear-gradient(90deg, var(--pink), var(--violet));
+  }
+
+  .duo-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .duo-card.tomek .duo-name {
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .duo-card.ksenia .duo-name {
+    background: linear-gradient(135deg, var(--pink), var(--violet));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .duo-info {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+
+  .duo-body {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #94a3b8;
+  }
+  .duo-body strong { color: var(--white); font-weight: 600; }
+
+  /* ===== CASE BOX ===== */
+  .case-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .case-header {
+    padding: 16px 28px;
+    background: rgba(124,58,237,0.08);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--purple);
+    font-weight: 600;
+  }
+
+  .case-body { padding: 24px 28px; }
+
+  .case-intro {
+    font-size: 15px;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .case-intro strong { color: var(--cyan); font-weight: 600; }
+
+  .duo-case-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .duo-case-col {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .duo-case-col h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .duo-case-col.tomek h4 {
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .duo-case-col.ksenia h4 {
+    background: linear-gradient(135deg, var(--pink), var(--violet));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--purple);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .duo-case-col.ksenia .step-num { color: var(--pink); }
+
+  .step-text {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.65;
+  }
+  .step-text strong { color: var(--white); }
+
+  .speech-box {
+    margin-top: 16px;
+    background: rgba(34,211,238,0.04);
+    border: 1px solid rgba(34,211,238,0.15);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .speech-tag {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .speech-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.75;
+    color: #94a3b8;
+    font-style: italic;
+  }
+
+  /* ===== CHANGES PAGE (p5) ===== */
+  .changes-body {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #94a3b8;
+  }
+  .changes-body strong { color: var(--white); font-weight: 600; }
+  .changes-list {
+    list-style: none;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .changes-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #94a3b8;
+  }
+  .changes-list li .ico {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* ===== PAGE BACKGROUNDS ===== */
+  #p1, #p3, #p5 { background: var(--bg); }
+  #p2, #p4 { background: #080810; }
+
+  .inner-page::before {
+    content: '';
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple), var(--cyan), transparent);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* ===== BACK / NEXT BUTTONS ===== */
+  .nav-btn {
+    position: fixed;
+    bottom: 32px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, opacity 0.3s, transform 0.3s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .nav-btn.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .nav-btn:hover { border-color: var(--purple); background: rgba(124,58,237,0.1); }
+  .nav-btn-back { left: 32px; }
+  .nav-btn-next { right: 32px; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 0px; background: transparent; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: transparent; }
+  * { scrollbar-width: none; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .home-name { font-size: clamp(36px, 12vw, 64px); letter-spacing: -2px; }
+    .home-badge { margin-bottom: 16px; }
+    .home-meta { flex-direction: column; border-radius: 12px; }
+    .home-meta-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .home-meta-item:last-child { border-bottom: none; }
+    .home-cards { grid-template-columns: repeat(2, 1fr); margin-top: 28px; gap: 10px; }
+    .home-card { padding: 18px 16px 40px; }
+
+    .duo-grid { grid-template-columns: 1fr; }
+    .duo-case-grid { grid-template-columns: 1fr; }
+
+    .nav-btn-back { left: 16px; bottom: 20px; }
+    .nav-btn-next { right: 16px; bottom: 20px; }
+
+    .inner-page { padding: 32px 16px 80px; }
+
+    .page-title { font-size: clamp(24px, 6vw, 36px); }
+
+    .case-body { padding: 18px 16px; }
+
+    .home-content {
+      width: 92vw;
+      overflow-y: auto;
+      max-height: calc(100dvh - 60px);
+      padding-top: 24px;
+      padding-bottom: 48px;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .home-cards { grid-template-columns: 1fr 1fr; }
+    .home-name { font-size: clamp(32px, 14vw, 52px); }
+    .name-and { letter-spacing: 4px; }
+    .duo-card { padding: 20px 16px; }
+    .duo-name { font-size: 17px; }
+    .step { padding: 10px 12px; }
+    .step-text { font-size: 12px; }
+    .speech-text { font-size: 11px; }
+  }
+
+  @media (orientation: portrait) {
+    #home { overflow: hidden; align-items: center; justify-content: center; }
+    .home-content {
+      width: 92vw;
+      overflow-y: auto;
+      max-height: calc(100dvh - 60px);
+      padding-top: 24px;
+      padding-bottom: 48px;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="hamburger" onclick="toggleMenu()" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="logo">RPU &mdash; <span>2026</span></div>
+  <button class="btn-home" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+      <polyline points="9 21 9 12 15 12 15 21"/>
+    </svg>
+    Home
+  </button>
+</div>
+
+<!-- BACK / NEXT -->
+<button class="nav-btn nav-btn-back" id="btn-back" onclick="navBack()">&#8592; Wstecz</button>
+<button class="nav-btn nav-btn-next" id="btn-next" onclick="navNext()">Dalej &#8594;</button>
+
+<!-- SIDE MENU -->
+<div class="menu-overlay" onclick="toggleMenu()"></div>
+<nav class="side-menu">
+  <div class="menu-header">
+    <p>Nawigacja</p>
+  </div>
+  <div class="menu-item active" id="menu-home" onclick="showPage('home'); toggleMenu()">
+    <span class="menu-item-num">00</span>
+    <span class="menu-item-text">
+      <span class="menu-item-label">Start</span>
+      <span class="menu-item-title">Strona główna</span>
+    </span>
+  </div>
+  <div class="menu-item" id="menu-p1" onclick="showPage('p1'); toggleMenu()">
+    <span class="menu-item-num">01</span>
+    <span class="menu-item-text">
+      <span class="menu-item-label">Kim jesteśmy</span>
+      <span class="menu-item-title">O nas</span>
+    </span>
+  </div>
+  <div class="menu-item" id="menu-p2" onclick="showPage('p2'); toggleMenu()">
+    <span class="menu-item-num">02</span>
+    <span class="menu-item-text">
+      <span class="menu-item-label">Motywacja</span>
+      <span class="menu-item-title">Dlaczego chcemy zostać Rzecznikami?</span>
+    </span>
+  </div>
+  <div class="menu-item" id="menu-p3" onclick="showPage('p3'); toggleMenu()">
+    <span class="menu-item-num">03</span>
+    <span class="menu-item-text">
+      <span class="menu-item-label">Nasze atuty</span>
+      <span class="menu-item-title">Dlaczego będziemy dobrymi Rzecznikami?</span>
+    </span>
+  </div>
+  <div class="menu-item" id="menu-p4" onclick="showPage('p4'); toggleMenu()">
+    <span class="menu-item-num">04</span>
+    <span class="menu-item-text">
+      <span class="menu-item-label">Studium przypadku</span>
+      <span class="menu-item-title">Komisja dyscyplinarna</span>
+    </span>
+  </div>
+  <div class="menu-item" id="menu-p5" onclick="showPage('p5'); toggleMenu()">
+    <span class="menu-item-num">05</span>
+    <span class="menu-item-text">
+      <span class="menu-item-label">Nasze plany</span>
+      <span class="menu-item-title">Co chcemy zmienić?</span>
+    </span>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="home">
+  <div class="home-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-lines"></div>
+  </div>
+
+  <div class="home-content">
+    <div class="home-badge"><span class="badge-dot"></span>Kandydaci · Rzecznicy Praw Ucznia</div>
+    <div class="home-names">
+      <h1 class="home-name">
+        <span class="first">Tomek </span><span class="last">Morek</span>
+      </h1>
+      <div class="name-and">&amp;</div>
+      <h1 class="home-name home-name-2">
+        <span class="first">Ksenia </span><span class="last">Kasparek</span>
+      </h1>
+    </div>
+    <div class="home-meta">
+      <div class="home-meta-item">Tomek: <strong>3R · DP1</strong></div>
+      <div class="home-meta-item">Ksenia: <strong>Pre-DP2</strong></div>
+    </div>
+    <div class="home-cards">
+      <div class="home-card" onclick="showPage('p1')">
+        <div class="card-num">01</div>
+        <div class="card-label">Kim jesteśmy</div>
+        <div class="card-title">O nas</div>
+        <span class="card-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="12" y2="2"/><polyline points="4 2 12 2 12 10"/></svg></span>
+      </div>
+      <div class="home-card" onclick="showPage('p2')">
+        <div class="card-num">02</div>
+        <div class="card-label">Motywacja</div>
+        <div class="card-title">Dlaczego chcemy zostać Rzecznikami?</div>
+        <span class="card-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="12" y2="2"/><polyline points="4 2 12 2 12 10"/></svg></span>
+      </div>
+      <div class="home-card" onclick="showPage('p3')">
+        <div class="card-num">03</div>
+        <div class="card-label">Nasze atuty</div>
+        <div class="card-title">Dlaczego będziemy dobrymi Rzecznikami?</div>
+        <span class="card-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="12" y2="2"/><polyline points="4 2 12 2 12 10"/></svg></span>
+      </div>
+      <div class="home-card" onclick="showPage('p4')">
+        <div class="card-num">04</div>
+        <div class="card-label">Studium przypadku</div>
+        <div class="card-title">Komisja dyscyplinarna</div>
+        <span class="card-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="12" y2="2"/><polyline points="4 2 12 2 12 10"/></svg></span>
+      </div>
+      <div class="home-card" onclick="showPage('p5')">
+        <div class="card-num">05</div>
+        <div class="card-label">Nasze plany</div>
+        <div class="card-title">Co chcemy zmienić?</div>
+        <span class="card-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="12" y2="2"/><polyline points="4 2 12 2 12 10"/></svg></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 1: O NAS -->
+<div class="page" id="p1">
+  <div class="inner-page">
+    <div class="page-wrap">
+      <div class="page-eyebrow">
+        <span class="eyebrow-num">01</span>
+        <span class="eyebrow-label">Kim jesteśmy</span>
+      </div>
+      <div class="line-accent"></div>
+      <h2 class="page-title">Kilka słów<br><span class="accent">o nas</span></h2>
+
+      <div class="duo-grid">
+        <div class="duo-card tomek">
+          <div class="duo-name">Tomek Morek</div>
+          <div class="duo-info">3R · DP1 — Historia, Matematyka, Angielski</div>
+          <div class="duo-body">
+            Znam szkołę od środka: jej zasady, jej ludzi i, co ważne, jej problemy. Organizowałem JASMOOTa i obecnie organizuję TEDx. Wiem, jak wygląda szkolna codzienność z perspektywy ucznia, i właśnie dlatego chcę działać jako głos społeczności.
+          </div>
+        </div>
+        <div class="duo-card ksenia">
+          <div class="duo-name">Ksenia Kasparek</div>
+          <div class="duo-info">Pre-DP2 — Matematyka, Fizyka, Informatyka</div>
+          <div class="duo-body">
+            Angażuję się w organizację projektów takich jak JASMUN i F1 in Schools — co dało mi sporo praktyki w planowaniu, komunikacji i pracy pod presją czasu.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: MOTYWACJA -->
+<div class="page" id="p2">
+  <div class="inner-page">
+    <div class="page-wrap">
+      <div class="page-eyebrow">
+        <span class="eyebrow-num">02</span>
+        <span class="eyebrow-label">Motywacja</span>
+      </div>
+      <div class="line-accent"></div>
+      <h2 class="page-title">Dlaczego chcemy zostać<br><span class="accent">Rzecznikami?</span></h2>
+
+      <div class="duo-grid">
+        <div class="duo-card tomek">
+          <div class="duo-name">Tomek</div>
+          <div class="duo-body">
+            Wierzę, że każdy uczeń zasługuje na to, by być wysłuchanym — niezależnie od klasy, ocen czy popularności. Zbyt często sprawy, które naprawdę dotyczą uczniów, kończą się zanim ktokolwiek zapyta ich o zdanie. Jako Rzecznik chcę być <strong>realnym łącznikiem</strong> między uczniami a szkołą — kimś, do kogo można przyjść z problemem i wiedzieć, że zostanie on potraktowany poważnie.
+          </div>
+        </div>
+        <div class="duo-card ksenia">
+          <div class="duo-name">Ksenia</div>
+          <div class="duo-body">
+            Kandyduję, bo widzę, że uczniowie często nie wiedzą, do kogo się zwrócić. Staram się patrzeć na sytuacje z różnych perspektyw i szukać rozwiązań, które są sprawiedliwe dla wszystkich stron. Ważne jest dla mnie, żeby <strong>każdy uczeń czuł, że ma w szkole wsparcie</strong> i że jego głos się liczy. Chcę być osobą, do której można podejść bez stresu i spokojnie porozmawiać.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: ATUTY -->
+<div class="page" id="p3">
+  <div class="inner-page">
+    <div class="page-wrap">
+      <div class="page-eyebrow">
+        <span class="eyebrow-num">03</span>
+        <span class="eyebrow-label">Nasze atuty</span>
+      </div>
+      <div class="line-accent"></div>
+      <h2 class="page-title">Dlaczego będziemy<br><span class="accent">dobrymi Rzecznikami?</span></h2>
+
+      <div class="duo-grid">
+        <div class="duo-card tomek">
+          <div class="duo-name">Tomek</div>
+          <div class="duo-body">
+            Mam <strong>dobre relacje z nauczycielami</strong>, potrafię rozmawiać z dorosłymi bez owijania w bawełnę, ale też z szacunkiem. Sam przeszedłem przez komisję dyscyplinarną w pierwszej klasie i wiem, jak bardzo w takiej chwili liczy się ktoś, kto po prostu stoi obok. To doświadczenie nauczyło mnie, że procedura musi służyć sprawiedliwości, nie odwrotnie.
+          </div>
+        </div>
+        <div class="duo-card ksenia">
+          <div class="duo-name">Ksenia</div>
+          <div class="duo-body">
+            Dobry rzecznik to ktoś, kto potrafi rozmawiać nie tylko z uczniami, ale i z nauczycielami. Chcę być osobą, do której <strong>każdy będzie mógł się zwrócić bez obawy</strong>, że zostanie zignorowany czy wyśmiany. Sama byłam w sytuacjach, kiedy uważałam, że coś nie jest fair, ale nie wiedziałam do kogo pójść. Właśnie dlatego chcę być Rzecznikiem, do którego można przyjść bez strachu.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: STUDIUM PRZYPADKU -->
+<div class="page" id="p4">
+  <div class="inner-page">
+    <div class="page-wrap">
+      <div class="page-eyebrow">
+        <span class="eyebrow-num">04</span>
+        <span class="eyebrow-label">Studium przypadku</span>
+      </div>
+      <div class="line-accent"></div>
+      <h2 class="page-title">Komisja<br><span class="accent">dyscyplinarna</span></h2>
+
+      <div class="case-wrap">
+        <div class="case-header">Scenariusz</div>
+        <div class="case-body">
+          <p class="case-intro">
+            Uczennica <strong>„B"</strong> prosi Rzecznika na korytarzu, żeby nie bronił <strong>„A"</strong> na komisji. „A" jeszcze się nie zgłosiła.
+          </p>
+
+          <div class="duo-case-grid">
+            <div class="duo-case-col tomek">
+              <h4>Tomek</h4>
+              <div class="steps">
+                <div class="step">
+                  <span class="step-num">01</span>
+                  <span class="step-text">Wysłucham „B" z pełną uwagą i powiem jej wprost, że jej krzywda jest dla mnie ważna — ale że nie mogę przyrzekać działań naruszających zasady mojej roli.</span>
+                </div>
+                <div class="step">
+                  <span class="step-num">02</span>
+                  <span class="step-text">Skontaktuję się z „A" i poinformuję ją o przysługujących jej prawach — decyzja o zwróceniu się do Rzecznika należy wyłącznie do niej.</span>
+                </div>
+                <div class="step">
+                  <span class="step-num">03</span>
+                  <span class="step-text">Zapoznam się z dokumentacją sprawy i upewnię się, że procedura komisji jest prowadzona zgodnie z regulaminem szkoły.</span>
+                </div>
+                <div class="step">
+                  <span class="step-num">04</span>
+                  <span class="step-text">Jeśli zostanę zaproszony na komisję — zabiorę głos w sprawie <strong>rzetelności procesu</strong>, nie wyroku.</span>
+                </div>
+              </div>
+              <div class="speech-box">
+                <div class="speech-tag">Przykładowa mowa na komisji</div>
+                <div class="speech-text">
+                  „Szanowna Komisjo — nie stoję tu, żeby bronić czynów ani orzekać o winie. Jestem tu, żeby upewnić się, że każda ze stron miała szansę zostać wysłuchana, a decyzja zostanie podjęta na podstawie faktów, nie emocji. Prawa ucznia obowiązują wszystkich — również tych, którym stawia się poważne zarzuty. Sprawiedliwość wymaga rzetelnego procesu. Proszę o jego zachowanie."
+                </div>
+              </div>
+            </div>
+
+            <div class="duo-case-col ksenia">
+              <h4>Ksenia</h4>
+              <div class="steps">
+                <div class="step">
+                  <span class="step-num">01</span>
+                  <span class="step-text">Wysłucham uczennicy „B" i okażę jej wsparcie, żeby czuła, że jej sytuacja jest ważna.</span>
+                </div>
+                <div class="step">
+                  <span class="step-num">02</span>
+                  <span class="step-text">Wyjaśnię, że jako Rzecznik muszę pozostać <strong>bezstronna</strong> i nie mogę odmówić wysłuchania drugiej strony.</span>
+                </div>
+                <div class="step">
+                  <span class="step-num">03</span>
+                  <span class="step-text">Skontaktuję się z uczennicą „A", żeby poznać jej punkt widzenia, a potem zbiorę wszystkie informacje obiektywnie.</span>
+                </div>
+                <div class="step">
+                  <span class="step-num">04</span>
+                  <span class="step-text">Podczas komisji upewnię się, że każda ze stron miała szansę się wypowiedzieć. Moją rolą nie jest stanięcie po którejś stronie, tylko dopilnowanie, żeby <strong>decyzja była sprawiedliwa i oparta na faktach</strong>.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: CO CHCEMY ZMIENIĆ -->
+<div class="page" id="p5">
+  <div class="inner-page">
+    <div class="page-wrap">
+      <div class="page-eyebrow">
+        <span class="eyebrow-num">05</span>
+        <span class="eyebrow-label">Nasze plany</span>
+      </div>
+      <div class="line-accent"></div>
+      <h2 class="page-title">Co chcemy<br><span class="accent">zmienić?</span></h2>
+
+      <div class="changes-body">
+        Jako duet Rzeczników chcemy, żeby każdy uczeń wiedział, że ma wsparcie i że jego głos naprawdę się liczy.
+        <ul class="changes-list">
+          <li>
+            <span class="ico">01</span>
+            <span><strong>Łatwiejszy kontakt z Rzecznikiem</strong> — chcemy być dostępni i widoczni, żeby każdy mógł się do nas zwrócić bez stresu.</span>
+          </li>
+          <li>
+            <span class="ico">02</span>
+            <span><strong>Edukacja o prawach ucznia</strong> — żeby uczniowie lepiej rozumieli swoje prawa i wiedzieli, gdzie szukać pomocy w trudnych sytuacjach.</span>
+          </li>
+          <li>
+            <span class="ico">03</span>
+            <span><strong>Realny łącznik uczeń–szkoła</strong> — żeby sprawy dotyczące uczniów nie kończyły się, zanim ktokolwiek zapyta ich o zdanie.</span>
+          </li>
+          <li>
+            <span class="ico">04</span>
+            <span><strong>Sprawiedliwe procedury</strong> — żeby każdy proces dyscyplinarny przebiegał rzetelnie, a każda strona miała szansę zostać wysłuchana.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var pages = ['home', 'p1', 'p2', 'p3', 'p4', 'p5'];
+  var current = 'home';
+
+  function showPage(id) {
+    document.getElementById(current).classList.remove('active');
+    document.querySelectorAll('.menu-item').forEach(function(el) {
+      el.classList.remove('active');
+    });
+
+    current = id;
+    document.getElementById(id).classList.add('active');
+
+    var menuEl = document.getElementById('menu-' + id);
+    if (menuEl) menuEl.classList.add('active');
+
+    if (document.body.classList.contains('menu-open')) {
+      document.body.classList.remove('menu-open');
+    }
+
+    // scroll inner page to top on page switch
+    var innerPage = document.querySelector('#' + id + ' .inner-page');
+    if (innerPage) innerPage.scrollTop = 0;
+
+    updateNavBtns();
+  }
+
+  function updateNavBtns() {
+    var btnBack = document.getElementById('btn-back');
+    var btnNext = document.getElementById('btn-next');
+
+    if (current === 'home') {
+      btnBack.classList.remove('visible');
+      btnNext.classList.remove('visible');
+      return;
+    }
+
+    var inner = document.querySelector('#' + current + ' .inner-page');
+    if (!inner) return;
+
+    var canScroll = inner.scrollHeight > inner.clientHeight + 4;
+    var atBottom = inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 8;
+
+    var show = !canScroll || atBottom;
+    var idx = pages.indexOf(current);
+
+    btnBack.classList.toggle('visible', show);
+    btnNext.classList.toggle('visible', show && idx < pages.length - 1);
+  }
+
+  document.querySelectorAll('.inner-page').forEach(function(el) {
+    el.addEventListener('scroll', updateNavBtns);
+  });
+
+  function navBack() {
+    var idx = pages.indexOf(current);
+    if (idx > 0) showPage(pages[idx - 1]);
+  }
+
+  function navNext() {
+    var idx = pages.indexOf(current);
+    if (idx < pages.length - 1) showPage(pages[idx + 1]);
+  }
+
+  function toggleMenu() {
+    document.body.classList.toggle('menu-open');
+  }
+</script>
+</body>
+</html>
